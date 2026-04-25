@@ -121,11 +121,9 @@ def _ensure_csvs():
 
     with st.spinner("Downloading Olist dataset from Kaggle — first run only, takes ~30 s..."):
         try:
-            import kaggle  # noqa: F401
-            from kaggle.api.kaggle_api_extended import KaggleApiExtended
-            api = KaggleApiExtended()
-            api.authenticate()
-            api.dataset_download_files(
+            import kaggle
+            kaggle.api.authenticate()
+            kaggle.api.dataset_download_files(
                 "olistbr/brazilian-ecommerce",
                 path=str(DATA_DIR),
                 unzip=True,

@@ -3,4 +3,4 @@ numpy
 plotly
 streamlit
 pyarrow
-kaggle
+kaggle==1.6.14
