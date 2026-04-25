@@ -4,6 +4,7 @@ Streamlit Dashboard
 """
 
 import json
+import os
 import urllib.request
 from pathlib import Path
 
@@ -12,7 +13,13 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+# Resolve data directory — try repo path first, fall back to /tmp on read-only filesystems
 DATA_DIR = Path(__file__).parent.parent / "data"
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except PermissionError:
+    DATA_DIR = Path("/tmp/olist_data")
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 st.set_page_config(
     page_title="Veridi Logistics — Delivery Audit",
@@ -88,7 +95,49 @@ def load_data():
     return df, state, pipeline
 
 
+def _ensure_csvs():
+    """Download Olist dataset from Kaggle if CSVs are not present (Streamlit Cloud first-run)."""
+    if (DATA_DIR / "olist_orders_dataset.csv").exists():
+        return
+
+    # Read credentials: Streamlit secrets take priority, then environment variables
+    try:
+        username = st.secrets["kaggle"]["username"]
+        key      = st.secrets["kaggle"]["key"]
+    except Exception:
+        username = os.environ.get("KAGGLE_USERNAME", "")
+        key      = os.environ.get("KAGGLE_KEY", "")
+
+    if not username or not key:
+        st.error(
+            "Dataset not found and no Kaggle credentials configured.  \n"
+            "Add `[kaggle]` `username` and `key` to Streamlit Cloud secrets, "
+            "or place the CSVs in the `data/` folder locally."
+        )
+        st.stop()
+
+    os.environ["KAGGLE_USERNAME"] = username
+    os.environ["KAGGLE_KEY"]      = key
+
+    with st.spinner("Downloading Olist dataset from Kaggle — first run only, takes ~30 s..."):
+        try:
+            import kaggle  # noqa: F401
+            from kaggle.api.kaggle_api_extended import KaggleApiExtended
+            api = KaggleApiExtended()
+            api.authenticate()
+            api.dataset_download_files(
+                "olistbr/brazilian-ecommerce",
+                path=str(DATA_DIR),
+                unzip=True,
+                quiet=True,
+            )
+        except Exception as exc:
+            st.error(f"Kaggle download failed: {exc}")
+            st.stop()
+
+
 def _process_from_csv():
+    _ensure_csvs()
     orders    = pd.read_csv(DATA_DIR / "olist_orders_dataset.csv")
     reviews   = pd.read_csv(DATA_DIR / "olist_order_reviews_dataset.csv")
     customers = pd.read_csv(DATA_DIR / "olist_customers_dataset.csv")
