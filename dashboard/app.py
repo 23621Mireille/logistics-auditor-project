@@ -223,7 +223,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<p class="filter-label">🌎 Filter by State</p>', unsafe_allow_html=True)
+    st.markdown('<p class="filter-label">Filter by State</p>', unsafe_allow_html=True)
     all_states = sorted(df["customer_state"].dropna().unique())
 
     # Session state — key must match the multiselect key so buttons can control it
@@ -243,7 +243,7 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown('<p class="filter-label">📊 Delivery Status</p>', unsafe_allow_html=True)
+    st.markdown('<p class="filter-label">📊  Delivery Status</p>', unsafe_allow_html=True)
     selected_status = st.multiselect(
         "Status", ORDER_CATS,
         default=ORDER_CATS,
@@ -262,19 +262,19 @@ with st.sidebar:
         sl_pct  = (filtered_preview["delivery_status"] == "Super Late").mean() * 100
         st.markdown(f"""
         <div class="stats-box">
-            <p>📋 <b>Filtered orders</b></p>
+            <p><b>Filtered orders</b></p>
             <p style="font-size:1.3rem; font-weight:700; color:#fff !important;">
                 {len(filtered_preview):,}
             </p>
-            <p>🟢 On Time &nbsp; <b>{on_pct:.1f}%</b></p>
-            <p>🟡 Late &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>{la_pct:.1f}%</b></p>
-            <p>🔴 Super Late <b>{sl_pct:.1f}%</b></p>
+            <p><span style="color:#2ecc71">●</span> On Time &nbsp; <b>{on_pct:.1f}%</b></p>
+            <p><span style="color:#f39c12">●</span> Late &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>{la_pct:.1f}%</b></p>
+            <p><span style="color:#e74c3c">●</span> Super Late <b>{sl_pct:.1f}%</b></p>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
         <div class="stats-box">
-            <p>⚠️ <b>No data selected</b></p>
+            <p><b>No data selected</b></p>
             <p style="font-size:0.8rem; color:#a0aec0 !important;">
                 Select at least one state and one delivery status to see results.
             </p>
@@ -283,7 +283,7 @@ with st.sidebar:
 
     # How to use guide
     st.markdown("---")
-    with st.expander("ℹ️ How to use"):
+    with st.expander("How to use"):
         st.markdown("""
 **Filters (this panel)**
 - **States** — narrow to specific Brazilian regions
@@ -292,7 +292,7 @@ with st.sidebar:
 
 **Tabs (main area)**
 - 🗺️ **Geographic** — map + bar showing which states have most late deliveries
-- 😊 **Sentiment** — correlation between delay and review scores
+- 📈 **Sentiment** — correlation between delay and review scores
 - 📦 **Categories** — which product types are shipped late most often
 - ⏱️ **Pipeline** — which phase (warehouse vs transit) causes delays
 
@@ -336,7 +336,7 @@ st.divider()
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4 = st.tabs([
-    "🗺️  Geographic", "😊  Sentiment", "📦  Categories", "⏱️  Pipeline Breakdown"
+    "🗺️  Geographic", "📈  Sentiment", "📦  Categories", "⏱️  Pipeline Breakdown"
 ])
 
 # ── Tab 1: Geographic ─────────────────────────────────────────────────────────
